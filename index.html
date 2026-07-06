@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>영어 섬 탈출 DAY 1</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#8ee7ff, #fff7b8);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #17324d;
+    }
+    .game {
+      width: min(92vw, 720px);
+      background: rgba(255,255,255,0.95);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      text-align: center;
+    }
+    h1 { margin: 8px 0 12px; font-size: 36px; }
+    h2 { margin: 8px 0 18px; font-size: 28px; }
+    .emoji { font-size: 86px; margin: 15px 0; }
+    .story { font-size: 20px; line-height: 1.5; margin: 16px 0 24px; }
+    input, select {
+      font-size: 18px;
+      padding: 12px;
+      width: 80%;
+      margin: 8px 0;
+      border: 2px solid #b8d8ee;
+      border-radius: 12px;
+    }
+    button {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 14px 22px;
+      margin: 8px;
+      border: none;
+      border-radius: 16px;
+      background: #1d9a6c;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #12714e;
+    }
+    button:hover { transform: translateY(1px); }
+    .choice {
+      display: block;
+      width: 85%;
+      margin: 12px auto;
+      background: #ffffff;
+      color: #17324d;
+      border: 3px solid #9fd8ff;
+      box-shadow: none;
+    }
+    .choice:hover { background: #e7f7ff; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    .feedback {
+      min-height: 32px;
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+    .correct { color: #148f5d; }
+    .wrong { color: #d13b3b; }
+    .small { font-size: 15px; color: #607080; margin-top: 18px; }
+    .badge {
+      font-size: 28px;
+      background: #fff1a8;
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 18px;
+      margin: 14px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="game" id="app"></div>
+
+<script>
+const questions = [
+  {emoji:"🍎", q:"What is this?", choices:["apple","dog","sun"], answer:"apple"},
+  {emoji:"🐶", q:"What is this?", choices:["cat","dog","fish"], answer:"dog"},
+  {emoji:"🍌", q:"What is this?", choices:["banana","book","chair"], answer:"banana"},
+  {emoji:"😃", q:"How does he feel?", choices:["happy","sad","cold"], answer:"happy"},
+  {emoji:"🐱", q:'Find "cat".', choices:["cap","cat","can"], answer:"cat"},
+  {emoji:"🐵", q:"What animal is this?", choices:["monkey","tiger","bird"], answer:"monkey"},
+  {emoji:"🍕", q:"What is this?", choices:["pizza","pencil","rabbit"], answer:"pizza"},
+  {emoji:"☀️", q:"What is this?", choices:["moon","sun","star"], answer:"sun"},
+  {emoji:"😢", q:"How does he feel?", choices:["happy","sad","angry"], answer:"sad"},
+  {emoji:"🐟", q:"What is this?", choices:["fish","frog","fox"], answer:"fish"}
+];
+
+let idx = 0;
+let score = 0;
+let playerName = "";
+let playerClass = "";
+
+const app = document.getElementById("app");
+
+function startScreen() {
+  app.innerHTML = `
+    <div class="emoji">🏝️🐵🌴</div>
+    <h1>영어 섬 탈출</h1>
+    <h2>DAY 1: Lost Island</h2>
+    <div class="story">
+      원숭이가 섬에 갇혔어요!<br>
+      영어 단어 미션을 풀고 탈출을 도와주세요.
+    </div>
+    <input id="name" placeholder="이름 입력 예: 김민준" />
+    <input id="className" placeholder="반 입력 예: SC1" />
+    <br>
+    <button onclick="beginGame()">START</button>
+    <div class="small">LEVEL 1 초1~2용 / 총 10문제 / 100점 만점</div>
+  `;
+}
+
+function beginGame() {
+  playerName = document.getElementById("name").value.trim();
+  playerClass = document.getElementById("className").value.trim();
+  if (!playerName || !playerClass) {
+    alert("이름과 반을 입력하세요.");
+    return;
+  }
+  idx = 0;
+  score = 0;
+  showQuestion();
+}
+
+function showQuestion() {
+  const item = questions[idx];
+  app.innerHTML = `
+    <div class="topbar">
+      <div>Mission ${idx + 1} / ${questions.length}</div>
+      <div>EXP ${score}</div>
+    </div>
+    <div class="emoji">${item.emoji}</div>
+    <h2>${item.q}</h2>
+    ${item.choices.map(c => `<button class="choice" onclick="checkAnswer('${c}')">${c}</button>`).join("")}
+    <div class="feedback" id="feedback"></div>
+  `;
+}
+
+function checkAnswer(choice) {
+  const item = questions[idx];
+  const fb = document.getElementById("feedback");
+  if (choice === item.answer) {
+    score += 10;
+    fb.innerHTML = "🎉 Correct! +10 EXP";
+    fb.className = "feedback correct";
+  } else {
+    fb.innerHTML = `❌ Try again! 정답은 ${item.answer}`;
+    fb.className = "feedback wrong";
+  }
+
+  setTimeout(() => {
+    idx++;
+    if (idx < questions.length) showQuestion();
+    else endScreen();
+  }, 900);
+}
+
+function endScreen() {
+  let badge = "Bronze Explorer";
+  if (score >= 90) badge = "Gold Explorer";
+  else if (score >= 70) badge = "Silver Explorer";
+
+  app.innerHTML = `
+    <div class="emoji">🚤🏆🌊</div>
+    <h1>탈출 성공!</h1>
+    <div class="story">
+      ${playerName} 학생의 최종 점수는
+    </div>
+    <div class="badge">${score} EXP<br>${badge}</div>
+    <div class="story">
+      선생님 확인용:<br>
+      이름: ${playerName}<br>
+      반: ${playerClass}<br>
+      난이도: LEVEL 1<br>
+      점수: ${score}
+    </div>
+    <button onclick="copyResult()">결과 복사하기</button>
+    <button onclick="startScreen()">다시 하기</button>
+    <div class="small">
+      다음 단계에서 이 결과가 자동으로 구글시트에 저장되게 연결할 예정입니다.
+    </div>
+  `;
+}
+
+function copyResult() {
+  const text = `영어 섬 탈출 DAY1 / ${playerClass} / ${playerName} / LEVEL1 / ${score}점`;
+  navigator.clipboard.writeText(text).then(() => {
+    alert("결과가 복사되었습니다. 선생님께 보내세요.");
+  });
+}
+
+startScreen();
+</script>
+</body>
+</html>
