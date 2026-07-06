@@ -1,76 +1,125 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>영어 섬 탈출 DAY 1</title>
-  <style>
-    body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:linear-gradient(#77d9ff,#fff3a6);min-height:100vh;display:flex;justify-content:center;align-items:center;color:#17324d}
-    .game{width:min(92vw,760px);background:rgba(255,255,255,.96);border-radius:28px;padding:28px;box-shadow:0 12px 30px rgba(0,0,0,.18);text-align:center}
-    h1{margin:8px 0 10px;font-size:38px} h2{margin:8px 0 18px;font-size:28px}
-    .emoji{font-size:88px;margin:14px 0}.story{font-size:20px;line-height:1.6;margin:16px 0 24px}
-    input{font-size:18px;padding:13px;width:82%;margin:8px 0;border:2px solid #b8d8ee;border-radius:12px}
-    button{font-size:20px;font-weight:bold;padding:14px 22px;margin:8px;border:none;border-radius:16px;background:#1d9a6c;color:white;cursor:pointer;box-shadow:0 5px 0 #12714e}
-    button:hover{transform:translateY(1px)} button:disabled{background:#9aa8a0;box-shadow:0 5px 0 #707870;cursor:not-allowed}
-    .choice{display:block;width:88%;margin:12px auto;background:#fff;color:#17324d;border:3px solid #9fd8ff;box-shadow:none}
-    .choice:hover{background:#e7f7ff}.topbar{display:flex;justify-content:space-between;gap:10px;font-weight:bold;margin-bottom:12px;font-size:18px}
-    .feedback{min-height:32px;font-size:22px;font-weight:bold;margin-top:12px}.correct{color:#148f5d}.wrong{color:#d13b3b}
-    .small{font-size:15px;color:#607080;margin-top:18px}.badge{font-size:28px;background:#fff1a8;display:inline-block;padding:14px 20px;border-radius:18px;margin:14px 0;border:3px solid #ffd95a}
-    .status{font-size:17px;margin-top:12px;color:#334;min-height:28px}.map{font-size:26px;letter-spacing:6px;background:#eefbff;border-radius:16px;padding:12px;margin:12px auto;width:fit-content}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Summer Island Rescue</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:linear-gradient(#58c7ff 0%,#b9f2ff 45%,#ffe891 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;color:#17324d}
+.game{width:min(94vw,760px);background:rgba(255,255,255,.96);border-radius:28px;padding:22px;box-shadow:0 12px 30px rgba(0,0,0,.22);text-align:center}
+h1{margin:8px 0;font-size:34px}h2{margin:8px 0 16px;font-size:25px}
+.emoji{font-size:76px;margin:10px 0}.story{font-size:18px;line-height:1.55;margin:14px 0 18px}
+input{font-size:18px;padding:13px;width:86%;margin:7px 0;border:2px solid #b8d8ee;border-radius:12px}
+button{font-size:18px;font-weight:bold;padding:13px 18px;margin:8px;border:none;border-radius:16px;background:#1d9a6c;color:white;cursor:pointer;box-shadow:0 5px 0 #12714e}
+button:active{transform:translateY(2px);box-shadow:0 3px 0 #12714e}button:disabled{background:#99aaa2;box-shadow:0 5px 0 #707870;cursor:not-allowed}
+.choice{display:block;width:90%;margin:11px auto;background:#fff;color:#17324d;border:3px solid #8fd4ff;box-shadow:none;font-size:21px}
+.levelBtn{display:block;width:90%;margin:12px auto;background:#fff;color:#17324d;border:3px solid #ffd35c;box-shadow:none;text-align:left}.levelBtn.selected{background:#fff1aa;border-color:#ff9f1c}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:bold;margin-bottom:12px;font-size:15px}
+.progress{letter-spacing:2px;font-size:18px;background:#eefbff;border-radius:14px;padding:9px;margin:8px auto 13px}
+.tag{display:inline-block;background:#e8f7ff;border:2px solid #9fd8ff;border-radius:12px;padding:6px 10px;font-weight:bold;margin:4px}
+.teacher{background:#fff7d6;border:3px dashed #ffbf3f;border-radius:20px;padding:14px;margin:12px 0;font-size:18px}
+.feedback{min-height:38px;font-size:20px;line-height:1.45;font-weight:bold;margin-top:12px}.correct{color:#148f5d}.wrong{color:#d13b3b}
+.small{font-size:14px;color:#607080;margin-top:14px}.badge{font-size:27px;background:#fff1a8;display:inline-block;padding:14px 20px;border-radius:18px;margin:14px 0;border:3px solid #ffd95a}
+.listenBtn{background:#3366cc;box-shadow:0 5px 0 #20438c;font-size:22px}.helper{background:#fff2fb;border:3px solid #ff9ee8;border-radius:18px;padding:12px;margin:10px 0}
+.status{font-size:17px;margin-top:12px;color:#334;min-height:28px}
+</style>
 </head>
 <body>
-  <div class="game" id="app"></div>
+<div class="game" id="app"></div>
 <script>
-/* 아래 YOUR_WEB_APP_URL_HERE를 네 Apps Script 웹 앱 URL로 바꿔야 자동 저장됨. */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytZa1ykFlNE3a4XdJIPJyQzK7PiZlWXlbLU1k7CD23KzUGcpjMuJ6mNaJl-AjH1apl/exec";
+const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
 const GAME_DAY = "DAY1";
-const GAME_LEVEL = "LEVEL1";
+const TEACHER = "Rachel";
 
-const questions = [
-  {emoji:"🍎", q:"What is this?", choices:["apple","dog","sun"], answer:"apple"},
-  {emoji:"🐶", q:"What is this?", choices:["cat","dog","fish"], answer:"dog"},
-  {emoji:"🍌", q:"What is this?", choices:["banana","book","chair"], answer:"banana"},
-  {emoji:"😃", q:"How does he feel?", choices:["happy","sad","cold"], answer:"happy"},
-  {emoji:"🐱", q:'Find "cat".', choices:["cap","cat","can"], answer:"cat"},
-  {emoji:"🐵", q:"What animal is this?", choices:["monkey","tiger","bird"], answer:"monkey"},
-  {emoji:"🍕", q:"What is this?", choices:["pizza","pencil","rabbit"], answer:"pizza"},
-  {emoji:"☀️", q:"What is this?", choices:["moon","sun","star"], answer:"sun"},
-  {emoji:"😢", q:"How does he feel?", choices:["happy","sad","angry"], answer:"sad"},
-  {emoji:"🐟", q:"What is this?", choices:["fish","frog","fox"], answer:"fish"}
+const level1Questions = [
+  {type:"picture", emoji:"🍎", sound:"short a", prompt:"알맞은 영어 단어를 골라보세요.", choices:["apple","banana","orange"], answer:"apple"},
+  {type:"picture", emoji:"🐱", sound:"short a", prompt:"알맞은 영어 단어를 골라보세요.", choices:["cat","cap","car"], answer:"cat"},
+  {type:"listen", word:"fish", sound:"short i", prompt:"발음을 잘 듣고 맞는 단어를 골라보세요.", choices:["fish","dish","ship"], answer:"fish"},
+  {type:"picture", emoji:"🐶", sound:"short o", prompt:"알맞은 영어 단어를 골라보세요.", choices:["dog","dig","duck"], answer:"dog"},
+  {type:"listen", word:"shop", sound:"sh", prompt:"발음을 잘 듣고 맞는 단어를 골라보세요.", choices:["ship","shop","chop"], answer:"shop"},
+  {type:"sound", word:"shop", sound:"sh", prompt:"shop과 같은 시작 소리가 나는 단어를 골라보세요.", choices:["shell","cat","pig"], answer:"shell"},
+  {type:"picture", emoji:"🍗", sound:"ch", prompt:"알맞은 영어 단어를 골라보세요.", choices:["chicken","kitchen","cat"], answer:"chicken"},
+  {type:"listen", word:"chair", sound:"ch", prompt:"발음을 잘 듣고 맞는 단어를 골라보세요.", choices:["chair","share","hair"], answer:"chair"},
+  {type:"helper", word:"have", sound:"Helper Word", prompt:"⭐ 특별 미션! 발음을 듣고 Helper Word를 골라보세요.", choices:["have","gave","hive"], answer:"have"},
+  {type:"picture", emoji:"🐟", sound:"short i", prompt:"알맞은 영어 단어를 골라보세요.", choices:["fish","dish","ship"], answer:"fish"},
+  {type:"listen", word:"cat", sound:"short a", prompt:"발음을 잘 듣고 맞는 단어를 골라보세요.", choices:["cat","cap","cup"], answer:"cat"},
+  {type:"final", word:"chicken", sound:"Final Mission", prompt:"👑 마지막 구조 미션! 발음을 듣고 맞는 단어를 골라보세요.", choices:["kitchen","chicken","children"], answer:"chicken"}
 ];
 
-let idx=0, score=0, playerName="", playerClass="", startTime=null, saved=false;
+const placeholderQuestions = [
+  {type:"picture", emoji:"🏝️", sound:"Coming Soon", prompt:"이 레벨은 곧 추가됩니다. 지금은 LEVEL 1을 선택해주세요.", choices:["LEVEL 1로 돌아가기","LEVEL 1로 돌아가기","LEVEL 1로 돌아가기"], answer:"LEVEL 1로 돌아가기"}
+];
+
+let playerName="", playerClass="", selectedLevel="", questions=[];
+let idx=0, score=0, stars=0, startTime=null, saved=false;
 const app=document.getElementById("app");
 
 function startScreen(){
-  saved=false;
+  saved=false; selectedLevel="";
   app.innerHTML=`
-    <div class="emoji">🏝️🐵🌴</div>
-    <h1>영어 섬 탈출</h1>
-    <h2>DAY 1: Lost Island</h2>
-    <div class="map">🏖️ → 🌴 → 🕳️ → 🚤</div>
-    <div class="story">원숭이가 섬에 갇혔어요!<br>영어 단어 미션 10개를 풀고 탈출을 도와주세요.</div>
-    <input id="name" placeholder="이름 입력 예: 김민준" autocomplete="off" />
-    <input id="className" placeholder="반 입력 예: SC1 / SE2 / ST3" autocomplete="off" />
-    <br><button onclick="beginGame()">START</button>
-    <div class="small">LEVEL 1 초1~2용 / 총 10문제 / 100 EXP 만점</div>`;
+    <div class="emoji">🏝️🚤🌊</div>
+    <h1>Summer Island Rescue</h1>
+    <h2>Save Rachel!</h2>
+    <div class="story">폭풍 때문에 선생님들이 섬에 흩어졌어요.<br>오늘은 <b>Rachel 선생님</b>을 구해야 합니다!</div>
+    <input id="name" placeholder="이름 입력 예: 김민준" autocomplete="off"/>
+    <input id="className" placeholder="반 입력 예: SC1 / SE2 / ST3" autocomplete="off"/>
+    <div class="story" style="margin-bottom:6px;">난이도를 선택하세요.</div>
+    <button class="levelBtn" id="lv1" onclick="selectLevel('LEVEL1')">🟢 LEVEL 1 - 파닉스 / 초1~2</button>
+    <button class="levelBtn" id="lv2" onclick="selectLevel('LEVEL2')">🟡 LEVEL 2 - 단어·문장 / 초3~4</button>
+    <button class="levelBtn" id="lv3" onclick="selectLevel('LEVEL3')">🔴 LEVEL 3 - 독해·문법 / 초5~6</button>
+    <button onclick="beginGame()">게임 시작</button>
+    <div class="small">현재 버전: LEVEL 1 문제 12개 완성 / LEVEL 2~3는 다음 단계에서 추가</div>`;
+}
+
+function selectLevel(level){
+  selectedLevel=level;
+  ["lv1","lv2","lv3"].forEach(id=>document.getElementById(id).classList.remove("selected"));
+  if(level==="LEVEL1") document.getElementById("lv1").classList.add("selected");
+  if(level==="LEVEL2") document.getElementById("lv2").classList.add("selected");
+  if(level==="LEVEL3") document.getElementById("lv3").classList.add("selected");
 }
 
 function beginGame(){
   playerName=document.getElementById("name").value.trim();
   playerClass=document.getElementById("className").value.trim();
   if(!playerName||!playerClass){alert("이름과 반을 정확히 입력하세요.");return;}
-  idx=0;score=0;startTime=new Date();showQuestion();
+  if(!selectedLevel){alert("난이도를 선택하세요.");return;}
+  questions = selectedLevel==="LEVEL1" ? level1Questions : placeholderQuestions;
+  idx=0; score=0; stars=0; saved=false; startTime=new Date();
+  storyIntro();
+}
+
+function storyIntro(){
+  app.innerHTML=`
+    <div class="emoji">🌊⛈️🏝️</div>
+    <h1>${TEACHER} Rescue</h1>
+    <div class="teacher">😭 <b>${TEACHER} 선생님</b><br>"도와줘! 해변에 혼자 남았어!"<br>"영어 미션을 풀어서 나를 구해줘!"</div>
+    <div class="story">총 <b>12개 미션</b>을 완료하면 Rachel 선생님을 구조할 수 있어요.</div>
+    <button onclick="showQuestion()">미션 시작</button>`;
+}
+
+function progressBar(){
+  return "⭐".repeat(stars) + "☆".repeat(questions.length-stars);
 }
 
 function showQuestion(){
   const item=questions[idx];
+  let special="";
+  if(item.type==="helper") special=`<div class="helper">⭐ Helper Word는 파닉스 규칙만으로 읽기 어려운 특별한 단어예요!</div>`;
+  if(item.type==="final") special=`<div class="helper">👑 FINAL RESCUE MISSION<br>이 문제를 풀면 Rachel 선생님을 구할 수 있어요!</div>`;
+  const listenPart=(item.type==="listen"||item.type==="helper"||item.type==="final")
+    ? `<button class="listenBtn" onclick="speak('${escapeQuote(item.word)}')">🔊 발음 듣기</button>` : "";
   app.innerHTML=`
-    <div class="topbar"><div>Mission ${idx+1}/${questions.length}</div><div>${GAME_LEVEL}</div><div>EXP ${score}</div></div>
-    <div class="emoji">${item.emoji}</div>
-    <h2>${item.q}</h2>
-    ${item.choices.map(c=>`<button class="choice" onclick="checkAnswer('${String(c).replace(/'/g,"\\'")}')">${c}</button>`).join("")}
+    <div class="topbar"><div>${GAME_DAY}</div><div>${selectedLevel}</div><div>문제 ${idx+1}/${questions.length}</div></div>
+    <div class="progress">${progressBar()}</div>
+    <div><span class="tag">오늘의 소리: ${item.sound}</span></div>
+    ${special}
+    <div class="emoji">${item.emoji ? item.emoji : "🎧"}</div>
+    <h2>${item.prompt}</h2>
+    ${listenPart}
+    ${item.type==="sound" ? `<div class="story"><b>${item.word}</b></div>` : ""}
+    ${item.choices.map(c=>`<button class="choice" onclick="checkAnswer('${escapeQuote(c)}')">${c}</button>`).join("")}
     <div class="feedback" id="feedback"></div>`;
 }
 
@@ -78,24 +127,63 @@ function checkAnswer(choice){
   const item=questions[idx];
   const fb=document.getElementById("feedback");
   document.querySelectorAll("button").forEach(b=>b.disabled=true);
-  if(choice===item.answer){score+=10;fb.innerHTML="🎉 Correct! +10 EXP";fb.className="feedback correct";}
-  else{fb.innerHTML=`❌ Try again! 정답은 ${item.answer}`;fb.className="feedback wrong";}
-  setTimeout(()=>{idx++; if(idx<questions.length) showQuestion(); else endScreen();},900);
+  if(choice===item.answer){
+    score+=10; stars++;
+    fb.innerHTML="🎉 정답입니다! +1 ⭐";
+    fb.className="feedback correct";
+  }else{
+    fb.innerHTML=`😥 아쉬워요!<br>정답은 <b>${item.answer}</b> 입니다.`;
+    fb.className="feedback wrong";
+  }
+  setTimeout(()=>{
+    idx++;
+    if(idx===4) storyMiddle1();
+    else if(idx===8) storyMiddle2();
+    else if(idx<questions.length) showQuestion();
+    else endScreen();
+  },1300);
+}
+
+function storyMiddle1(){
+  app.innerHTML=`
+    <div class="emoji">🌊👀</div>
+    <h1>Rachel 발견!</h1>
+    <div class="teacher">😭 "누군가 오는 것 같아!"<br>"조금만 더 도와줘!"</div>
+    <div class="progress">${progressBar()}</div>
+    <button onclick="showQuestion()">계속하기</button>`;
+}
+
+function storyMiddle2(){
+  app.innerHTML=`
+    <div class="emoji">🚤✨</div>
+    <h1>구조 보트 발견!</h1>
+    <div class="teacher">😊 "좋아! 이제 보트까지 거의 다 왔어!"<br>"마지막 미션만 남았어!"</div>
+    <div class="progress">${progressBar()}</div>
+    <button onclick="showQuestion()">마지막 미션으로</button>`;
 }
 
 function endScreen(){
-  let badge="Bronze Explorer";
-  if(score>=90) badge="Gold Explorer"; else if(score>=70) badge="Silver Explorer";
+  let badge="Bronze Rescuer";
+  if(score>=100) badge="Gold Rescuer";
+  else if(score>=80) badge="Silver Rescuer";
   app.innerHTML=`
     <div class="emoji">🚤🏆🌊</div>
-    <h1>탈출 성공!</h1>
-    <div class="story">${playerName} 학생의 최종 결과</div>
-    <div class="badge">${score} EXP<br>${badge}</div>
-    <div class="story">이름: ${playerName}<br>반: ${playerClass}<br>난이도: ${GAME_LEVEL}<br>점수: ${score}</div>
+    <h1>Rachel 구조 성공!</h1>
+    <div class="teacher">🥹 <b>Rachel 선생님</b><br>"고마워! 덕분에 무사히 탈출했어!"</div>
+    <div class="badge">${stars} / 12 ⭐<br>${score} EXP<br>${badge}</div>
+    <div class="story">이름: ${playerName}<br>반: ${playerClass}<br>난이도: ${selectedLevel}<br>점수: ${score}</div>
     <button id="saveBtn" onclick="saveToSheet()">선생님 기록에 저장하기</button>
-    <button onclick="startScreen()">다시 하기</button>
+    <button onclick="startScreen()">처음으로</button>
     <div class="status" id="saveStatus">마지막으로 저장 버튼을 눌러야 기록됩니다.</div>
-    <div class="small">저장 후 선생님 구글시트 LOG에서 확인 가능</div>`;
+    <div class="small">다음 미션: Alex 선생님을 구하러 가세요!</div>`;
+}
+
+function speak(text){
+  if(!("speechSynthesis" in window)){alert("이 기기에서는 발음 재생을 지원하지 않을 수 있습니다.");return;}
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US"; u.rate=0.78; u.pitch=1;
+  window.speechSynthesis.speak(u);
 }
 
 function saveToSheet(){
@@ -106,11 +194,12 @@ function saveToSheet(){
   saveBtn.disabled=true; status.innerText="저장 중... 잠시만 기다리세요.";
   const playSeconds=startTime?Math.round((new Date()-startTime)/1000):"";
   fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",body:JSON.stringify({
-    name:playerName,className:playerClass,level:GAME_LEVEL,score:score,day:GAME_DAY,playSeconds:playSeconds
+    name:playerName,className:playerClass,level:selectedLevel,score:score,day:GAME_DAY,teacher:TEACHER,stars:stars,playSeconds:playSeconds
   })}).then(()=>{saved=true;status.innerText="✅ 저장 완료! 선생님 기록에 제출되었습니다.";})
   .catch(()=>{saveBtn.disabled=false;status.innerText="❌ 저장 실패. 인터넷 연결을 확인하고 다시 눌러주세요.";});
 }
 
+function escapeQuote(str){return String(str).replace(/'/g,"\\'");}
 startScreen();
 </script>
 </body>
