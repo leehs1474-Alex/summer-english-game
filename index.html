@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>영어 섬 탈출 DAY 1</title>
+  <style>
+    body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:linear-gradient(#77d9ff,#fff3a6);min-height:100vh;display:flex;justify-content:center;align-items:center;color:#17324d}
+    .game{width:min(92vw,760px);background:rgba(255,255,255,.96);border-radius:28px;padding:28px;box-shadow:0 12px 30px rgba(0,0,0,.18);text-align:center}
+    h1{margin:8px 0 10px;font-size:38px} h2{margin:8px 0 18px;font-size:28px}
+    .emoji{font-size:88px;margin:14px 0}.story{font-size:20px;line-height:1.6;margin:16px 0 24px}
+    input{font-size:18px;padding:13px;width:82%;margin:8px 0;border:2px solid #b8d8ee;border-radius:12px}
+    button{font-size:20px;font-weight:bold;padding:14px 22px;margin:8px;border:none;border-radius:16px;background:#1d9a6c;color:white;cursor:pointer;box-shadow:0 5px 0 #12714e}
+    button:hover{transform:translateY(1px)} button:disabled{background:#9aa8a0;box-shadow:0 5px 0 #707870;cursor:not-allowed}
+    .choice{display:block;width:88%;margin:12px auto;background:#fff;color:#17324d;border:3px solid #9fd8ff;box-shadow:none}
+    .choice:hover{background:#e7f7ff}.topbar{display:flex;justify-content:space-between;gap:10px;font-weight:bold;margin-bottom:12px;font-size:18px}
+    .feedback{min-height:32px;font-size:22px;font-weight:bold;margin-top:12px}.correct{color:#148f5d}.wrong{color:#d13b3b}
+    .small{font-size:15px;color:#607080;margin-top:18px}.badge{font-size:28px;background:#fff1a8;display:inline-block;padding:14px 20px;border-radius:18px;margin:14px 0;border:3px solid #ffd95a}
+    .status{font-size:17px;margin-top:12px;color:#334;min-height:28px}.map{font-size:26px;letter-spacing:6px;background:#eefbff;border-radius:16px;padding:12px;margin:12px auto;width:fit-content}
+  </style>
+</head>
+<body>
+  <div class="game" id="app"></div>
+<script>
+/* 아래 YOUR_WEB_APP_URL_HERE를 네 Apps Script 웹 앱 URL로 바꿔야 자동 저장됨. */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytZa1ykFlNE3a4XdJIPJyQzK7PiZlWXlbLU1k7CD23KzUGcpjMuJ6mNaJl-AjH1apl/exec";
+const GAME_DAY = "DAY1";
+const GAME_LEVEL = "LEVEL1";
+
+const questions = [
+  {emoji:"🍎", q:"What is this?", choices:["apple","dog","sun"], answer:"apple"},
+  {emoji:"🐶", q:"What is this?", choices:["cat","dog","fish"], answer:"dog"},
+  {emoji:"🍌", q:"What is this?", choices:["banana","book","chair"], answer:"banana"},
+  {emoji:"😃", q:"How does he feel?", choices:["happy","sad","cold"], answer:"happy"},
+  {emoji:"🐱", q:'Find "cat".', choices:["cap","cat","can"], answer:"cat"},
+  {emoji:"🐵", q:"What animal is this?", choices:["monkey","tiger","bird"], answer:"monkey"},
+  {emoji:"🍕", q:"What is this?", choices:["pizza","pencil","rabbit"], answer:"pizza"},
+  {emoji:"☀️", q:"What is this?", choices:["moon","sun","star"], answer:"sun"},
+  {emoji:"😢", q:"How does he feel?", choices:["happy","sad","angry"], answer:"sad"},
+  {emoji:"🐟", q:"What is this?", choices:["fish","frog","fox"], answer:"fish"}
+];
+
+let idx=0, score=0, playerName="", playerClass="", startTime=null, saved=false;
+const app=document.getElementById("app");
+
+function startScreen(){
+  saved=false;
+  app.innerHTML=`
+    <div class="emoji">🏝️🐵🌴</div>
+    <h1>영어 섬 탈출</h1>
+    <h2>DAY 1: Lost Island</h2>
+    <div class="map">🏖️ → 🌴 → 🕳️ → 🚤</div>
+    <div class="story">원숭이가 섬에 갇혔어요!<br>영어 단어 미션 10개를 풀고 탈출을 도와주세요.</div>
+    <input id="name" placeholder="이름 입력 예: 김민준" autocomplete="off" />
+    <input id="className" placeholder="반 입력 예: SC1 / SE2 / ST3" autocomplete="off" />
+    <br><button onclick="beginGame()">START</button>
+    <div class="small">LEVEL 1 초1~2용 / 총 10문제 / 100 EXP 만점</div>`;
+}
+
+function beginGame(){
+  playerName=document.getElementById("name").value.trim();
+  playerClass=document.getElementById("className").value.trim();
+  if(!playerName||!playerClass){alert("이름과 반을 정확히 입력하세요.");return;}
+  idx=0;score=0;startTime=new Date();showQuestion();
+}
+
+function showQuestion(){
+  const item=questions[idx];
+  app.innerHTML=`
+    <div class="topbar"><div>Mission ${idx+1}/${questions.length}</div><div>${GAME_LEVEL}</div><div>EXP ${score}</div></div>
+    <div class="emoji">${item.emoji}</div>
+    <h2>${item.q}</h2>
+    ${item.choices.map(c=>`<button class="choice" onclick="checkAnswer('${String(c).replace(/'/g,"\\'")}')">${c}</button>`).join("")}
+    <div class="feedback" id="feedback"></div>`;
+}
+
+function checkAnswer(choice){
+  const item=questions[idx];
+  const fb=document.getElementById("feedback");
+  document.querySelectorAll("button").forEach(b=>b.disabled=true);
+  if(choice===item.answer){score+=10;fb.innerHTML="🎉 Correct! +10 EXP";fb.className="feedback correct";}
+  else{fb.innerHTML=`❌ Try again! 정답은 ${item.answer}`;fb.className="feedback wrong";}
+  setTimeout(()=>{idx++; if(idx<questions.length) showQuestion(); else endScreen();},900);
+}
+
+function endScreen(){
+  let badge="Bronze Explorer";
+  if(score>=90) badge="Gold Explorer"; else if(score>=70) badge="Silver Explorer";
+  app.innerHTML=`
+    <div class="emoji">🚤🏆🌊</div>
+    <h1>탈출 성공!</h1>
+    <div class="story">${playerName} 학생의 최종 결과</div>
+    <div class="badge">${score} EXP<br>${badge}</div>
+    <div class="story">이름: ${playerName}<br>반: ${playerClass}<br>난이도: ${GAME_LEVEL}<br>점수: ${score}</div>
+    <button id="saveBtn" onclick="saveToSheet()">선생님 기록에 저장하기</button>
+    <button onclick="startScreen()">다시 하기</button>
+    <div class="status" id="saveStatus">마지막으로 저장 버튼을 눌러야 기록됩니다.</div>
+    <div class="small">저장 후 선생님 구글시트 LOG에서 확인 가능</div>`;
+}
+
+function saveToSheet(){
+  if(saved){document.getElementById("saveStatus").innerText="이미 저장되었습니다.";return;}
+  if(!WEB_APP_URL||WEB_APP_URL==="YOUR_WEB_APP_URL_HERE"){alert("아직 Apps Script 웹 앱 URL이 들어가지 않았습니다.");return;}
+  const saveBtn=document.getElementById("saveBtn");
+  const status=document.getElementById("saveStatus");
+  saveBtn.disabled=true; status.innerText="저장 중... 잠시만 기다리세요.";
+  const playSeconds=startTime?Math.round((new Date()-startTime)/1000):"";
+  fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",body:JSON.stringify({
+    name:playerName,className:playerClass,level:GAME_LEVEL,score:score,day:GAME_DAY,playSeconds:playSeconds
+  })}).then(()=>{saved=true;status.innerText="✅ 저장 완료! 선생님 기록에 제출되었습니다.";})
+  .catch(()=>{saveBtn.disabled=false;status.innerText="❌ 저장 실패. 인터넷 연결을 확인하고 다시 눌러주세요.";});
+}
+
+startScreen();
+</script>
+</body>
+</html>
