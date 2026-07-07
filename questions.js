@@ -106,58 +106,7 @@ const GAME_DATA = {
       }
     ]
   },
-      },
-      {
-        type: "listen",
-        word: "chick",
-        sound: "ch",
-        prompt: "발음을 듣고 맞는 단어를 골라보세요.",
-        choices: ["ship", "chick", "fish"],
-        answer: "chick"
-      },
-      {
-        type: "listen",
-        word: "bus",
-        sound: "short u",
-        prompt: "발음을 듣고 맞는 단어를 골라보세요.",
-        choices: ["bug", "boss", "bus"],
-        answer: "bus"
-      },
-      {
-        type: "helper",
-        word: "have",
-        sound: "Helper Word",
-        prompt: "⭐ 특별 미션! 발음을 듣고 Helper Word를 골라보세요.",
-        choices: ["have", "gave", "hive"],
-        answer: "have"
-      },
-      {
-        type: "listen",
-        word: "hat",
-        sound: "short a",
-        prompt: "발음을 듣고 맞는 단어를 골라보세요.",
-        choices: ["hot", "hat", "hit"],
-        answer: "hat"
-      },
-      {
-        type: "listen",
-        word: "duck",
-        sound: "ck",
-        prompt: "발음을 듣고 맞는 단어를 골라보세요.",
-        choices: ["deck", "dock", "duck"],
-        answer: "duck"
-      },
-      {
-        type: "final",
-        word: "chicken",
-        sound: "Final Mission",
-        prompt: "👑 마지막 구조 미션! 발음을 듣고 맞는 단어를 골라보세요.",
-        choices: ["kitchen", "chicken", "children"],
-        answer: "chicken"
-      }
-    ]
-  },
-
+     
   DAY2: {
     teacher: "Alex",
     place: "정글",
