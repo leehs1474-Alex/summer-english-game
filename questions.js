@@ -21,7 +21,7 @@ const GAME_DATA = {
         word: "pen",
         sound: "short e",
         prompt: "발음을 듣고 맞는 단어를 골라보세요.",
-        choices: ["pan", "pen", "pin"],
+        choices: ["pin", "pen", "pun"],
         answer: "pen"
       },
       {
@@ -45,7 +45,7 @@ const GAME_DATA = {
         word: "sun",
         sound: "short u",
         prompt: "발음을 듣고 맞는 단어를 골라보세요.",
-        choices: ["son", "sun", "sin"],
+        choices: ["sen", "sun", "sin"],
         answer: "sun"
       },
       {
@@ -185,7 +185,7 @@ const GAME_DATA = {
         word: "come",
         sound: "Helper Word",
         prompt: "⭐ 특별 미션! 발음을 듣고 Helper Word를 골라보세요.",
-        choices: ["came", "come", "comb"],
+        choices: ["came", "come", "comp"],
         answer: "come"
       },
       {
@@ -421,7 +421,7 @@ const GAME_DATA = {
         word: "two",
         sound: "Helper Word",
         prompt: "⭐ 특별 미션! 발음을 듣고 Helper Word를 골라보세요.",
-        choices: ["too", "two", "to"],
+        choices: ["tooth", "two", "tow"],
         answer: "two"
       },
 
