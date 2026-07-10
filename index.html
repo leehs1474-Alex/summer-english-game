@@ -25,12 +25,15 @@ button:active{transform:translateY(2px);box-shadow:0 3px 0 #12714e}button:disabl
 .listenBtn{background:#3366cc;box-shadow:0 5px 0 #20438c;font-size:22px}.helper{background:#fff2fb;border:3px solid #ff9ee8;border-radius:18px;padding:12px;margin:10px 0}
 .status{font-size:17px;margin-top:12px;color:#334;min-height:28px}
 .grid{display:grid;grid-template-columns:1fr;gap:4px}
+.sceneImage{display:block;width:min(100%,620px);max-height:340px;object-fit:contain;margin:12px auto;border-radius:18px;border:3px solid #b8d8ee;background:#f7fcff}
+.sentenceBox{font-size:21px;line-height:1.55;background:#fff8d8;border:3px solid #ffd35c;border-radius:16px;padding:16px;margin:14px auto;width:92%;font-weight:bold}
 </style>
 </head>
 <body>
 <div class="game" id="app"></div>
 
 <script src="questions.js"></script>
+<script src="questions-level2.js"></script>
 <script>
 const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
 let playerName="", playerClass="", selectedLevel="", selectedDay="";
@@ -49,10 +52,10 @@ function startScreen(){
     <input id="className" placeholder="반 입력 예: SC1 / SE2 / ST3" autocomplete="off"/>
     <div class="story" style="margin-bottom:6px;">난이도를 선택하세요.</div>
     <button class="levelBtn" id="lv1" onclick="selectLevel('LEVEL1')">🟢 LEVEL 1 - 파닉스 / 초1~2</button>
-    <button class="levelBtn" id="lv2" onclick="selectLevel('LEVEL2')">🟡 LEVEL 2 - 단어·문장 / 준비 중</button>
+    <button class="levelBtn" id="lv2" onclick="selectLevel('LEVEL2')">🟡 LEVEL 2 - 의미·문맥 / 초3~5</button>
     <button class="levelBtn" id="lv3" onclick="selectLevel('LEVEL3')">🔴 LEVEL 3 - 독해·문법 / 준비 중</button>
     <button onclick="goDaySelect()">다음</button>
-    <div class="small">현재 버전: LEVEL 1 DAY1~DAY4 48문제 완성</div>`;
+    <div class="small">현재 버전: LEVEL 1·2 DAY1~DAY4</div>`;
 }
 
 function selectLevel(level){
@@ -68,7 +71,7 @@ function goDaySelect(){
   playerClass=document.getElementById("className").value.trim();
   if(!playerName||!playerClass){alert("이름과 반을 정확히 입력하세요.");return;}
   if(!selectedLevel){alert("난이도를 선택하세요.");return;}
-  if(selectedLevel!=="LEVEL1"){alert("현재는 LEVEL 1만 플레이 가능합니다.");return;}
+  if(selectedLevel==="LEVEL3"){alert("LEVEL 3는 준비 중입니다.");return;}
   daySelectScreen();
 }
 
@@ -93,7 +96,9 @@ function selectDay(day){
 
 function beginGame(){
   if(!selectedDay){alert("DAY를 선택하세요.");return;}
-  currentDayData=GAME_DATA[selectedDay];
+  const dataSource = selectedLevel === "LEVEL2" ? LEVEL2_DATA : GAME_DATA;
+  currentDayData=dataSource[selectedDay];
+  if(!currentDayData){alert("선택한 레벨의 문제가 아직 준비되지 않았습니다.");return;}
   questions=currentDayData.questions;
   idx=0; score=0; stars=0; saved=false; startTime=new Date();
   storyIntro();
@@ -118,17 +123,33 @@ function showQuestion(){
   let special="";
   if(item.type==="helper") special=`<div class="helper">⭐ Helper Word는 파닉스 규칙만으로 읽기 어려운 특별한 단어예요!</div>`;
   if(item.type==="final") special=`<div class="helper">👑 FINAL RESCUE MISSION<br>이 문제를 풀면 선생님을 구할 수 있어요!</div>`;
-  const listenPart=(item.type==="listen"||item.type==="helper"||item.type==="final")
-    ? `<button class="listenBtn" onclick="speak('${escapeQuote(item.word)}')">🔊 발음 듣기</button>` : "";
+
+  let mediaPart="";
+  let tagPart="";
+
+  if(item.type==="picture_sentence"){
+    mediaPart=`<img class="sceneImage" src="${item.image}" alt="문제 그림" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<div class=&quot;helper&quot;>그림 파일을 찾을 수 없습니다: ${item.image}</div>');">`;
+    tagPart=`<div><span class="tag">그림 추론</span></div>`;
+  }else if(item.type==="listen_sentence"){
+    mediaPart=`<button class="listenBtn" onclick="playAudioFile('${escapeQuote(item.audio)}')">🔊 듣기 재생</button>`;
+    tagPart=`<div><span class="tag">듣기 추론</span></div>`;
+  }else if(item.type==="blank_word"){
+    mediaPart=`<div class="sentenceBox">${item.sentence}</div>`;
+    tagPart=`<div><span class="tag">단어 문맥 추론</span></div>`;
+  }else{
+    const listenPart=(item.type==="listen"||item.type==="helper"||item.type==="final")
+      ? `<button class="listenBtn" onclick="speak('${escapeQuote(item.word)}')">🔊 발음 듣기</button>` : "";
+    tagPart=`<div><span class="tag">오늘의 소리: ${item.sound}</span></div>`;
+    mediaPart=`<div class="emoji">${item.emoji ? item.emoji : "🎧"}</div>${listenPart}${item.type==="sound" ? `<div class="story"><b>${item.word}</b></div>` : ""}`;
+  }
+
   app.innerHTML=`
     <div class="topbar"><div>${selectedDay}</div><div>${selectedLevel}</div><div>문제 ${idx+1}/${questions.length}</div></div>
     <div class="progress">${progressBar()}</div>
-    <div><span class="tag">오늘의 소리: ${item.sound}</span></div>
+    ${tagPart}
     ${special}
-    <div class="emoji">${item.emoji ? item.emoji : "🎧"}</div>
+    ${mediaPart}
     <h2>${item.prompt}</h2>
-    ${listenPart}
-    ${item.type==="sound" ? `<div class="story"><b>${item.word}</b></div>` : ""}
     ${item.choices.map(c=>`<button class="choice" onclick="checkAnswer('${escapeQuote(c)}')">${c}</button>`).join("")}
     <div class="feedback" id="feedback"></div>`;
 }
@@ -180,13 +201,21 @@ function endScreen(){
     <div class="emoji">🚤🏆🌊</div>
     <h1>${currentDayData.teacher} 구조 성공!</h1>
     <div class="teacher">🥹 <b>${currentDayData.teacher} 선생님</b><br>"고마워! 덕분에 무사히 탈출했어!"</div>
-    <div class="badge">${stars} / 12 ⭐<br>${score} EXP<br>${badge}</div>
+    <div class="badge">${stars} / ${questions.length} ⭐<br>${score} EXP<br>${badge}</div>
     <div class="story">이름: ${playerName}<br>반: ${playerClass}<br>난이도: ${selectedLevel}<br>DAY: ${selectedDay}<br>점수: ${score}</div>
     <button id="saveBtn" onclick="saveToSheet()">선생님 기록에 저장하기</button>
     <button onclick="daySelectScreen()">다른 DAY 하기</button>
     <button onclick="startScreen()">처음으로</button>
     <div class="status" id="saveStatus">마지막으로 저장 버튼을 눌러야 기록됩니다.</div>
     <div class="small">${currentDayData.next}</div>`;
+}
+
+function playAudioFile(path){
+  const audio = new Audio(path);
+  audio.play().catch(err=>{
+    console.error(err);
+    alert("오디오 파일을 찾을 수 없습니다.\n\n" + path);
+  });
 }
 
 function speak(text){
