@@ -146,6 +146,9 @@ function showQuestion(){
   }else if(item.type==="blank_word"){
     mediaPart=`<div class="sentenceBox">${item.sentence}</div>`;
     tagPart=`<div><span class="tag">단어 문맥 추론</span></div>`;
+  }else if(selectedLevel==="LEVEL3"){
+    tagPart=`<div><span class="tag">📝 문법 문제</span></div>`;
+    mediaPart="";
   }else{
     const listenPart=(item.type==="listen"||item.type==="helper"||item.type==="final")
       ? `<button class="listenBtn" onclick="speak('${escapeQuote(item.word)}')">🔊 발음 듣기</button>` : "";
