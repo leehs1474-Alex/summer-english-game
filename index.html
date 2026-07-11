@@ -171,6 +171,104 @@ button:disabled{background:#99aaa2;box-shadow:0 5px 0 #707870;cursor:not-allowed
   .finalActions button{width:92%;min-width:0;margin:4px auto}
 }
 
+
+/* Immersive start / intro / found screens */
+.game.storyScreen,
+.game.startPosterScreen{
+  width:min(96vw,980px);
+  background:rgba(10,20,28,.34);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 18px 55px rgba(0,0,0,.45);
+  color:#fff;
+  padding:24px 26px 30px;
+  backdrop-filter:blur(7px);
+}
+.storyTitle,
+.startPosterTitle{
+  margin:4px 0 16px;
+  font-size:clamp(34px,5.5vw,58px);
+  line-height:1.1;
+  color:#fff8de;
+  text-shadow:0 4px 14px rgba(0,0,0,.8);
+}
+.storyTitle .teacherName{
+  color:#ffd34e;
+}
+.storyScreen .teacherPhoto{
+  width:min(92%,760px);
+  max-width:760px;
+  height:auto;
+  max-height:none;
+  object-fit:contain;
+  margin:12px auto 20px;
+  border-radius:30px;
+  border:4px solid rgba(255,197,45,.96);
+  box-shadow:0 18px 45px rgba(0,0,0,.48),0 0 24px rgba(255,185,45,.24);
+}
+.storyQuote{
+  width:min(94%,820px);
+  margin:0 auto 18px;
+  padding:16px 20px;
+  border-radius:22px;
+  background:rgba(255,248,220,.96);
+  color:#17324d;
+  border:3px dashed #ffb52f;
+  font-size:20px;
+  line-height:1.55;
+}
+.storyScreen .story,
+.startPosterScreen .story{
+  color:#fff;
+  text-shadow:0 2px 6px rgba(0,0,0,.8);
+}
+.storyScreen .progress{
+  width:min(94%,820px);
+}
+.mainPoster{
+  display:block;
+  width:min(92%,760px);
+  max-width:760px;
+  height:auto;
+  margin:10px auto 20px;
+  border-radius:28px;
+  border:4px solid rgba(255,197,45,.96);
+  box-shadow:0 18px 45px rgba(0,0,0,.48),0 0 24px rgba(255,185,45,.20);
+}
+.startForm{
+  width:min(94%,820px);
+  margin:0 auto;
+  padding:18px 16px;
+  border-radius:22px;
+  background:rgba(255,255,255,.93);
+  color:#17324d;
+  box-shadow:0 10px 28px rgba(0,0,0,.24);
+}
+.startPosterScreen input{
+  background:#fff;
+}
+.startPosterScreen .small{
+  color:#fff;
+  text-shadow:0 2px 6px rgba(0,0,0,.8);
+}
+@media (max-width:640px){
+  .game.storyScreen,
+  .game.startPosterScreen{
+    padding:18px 12px 24px;
+  }
+  .storyTitle,
+  .startPosterTitle{
+    font-size:36px;
+  }
+  .storyScreen .teacherPhoto,
+  .mainPoster{
+    width:96%;
+    border-radius:22px;
+  }
+  .storyQuote{
+    font-size:18px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -180,7 +278,7 @@ button:disabled{background:#99aaa2;box-shadow:0 5px 0 #707870;cursor:not-allowed
 <script src="questions-level2.js"></script>
 <script src="questions-level3.js"></script>
 <script>
-const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytZa1ykFlNE3a4XdJIPJyQzK7PiZlWXlbLU1k7CD23KzUGcpjMuJ6mNaJl-AjH1apl/exec";
 let playerName="", playerClass="", selectedLevel="", selectedDay="";
 let currentDayData=null, questions=[];
 let idx=0, score=0, stars=0, startTime=null, saved=false;
@@ -236,24 +334,29 @@ function teacherPhoto(stage){
 
 
 function startScreen(){
-  app.classList.remove("finalScreen");
+  app.classList.remove("finalScreen","storyScreen","startPosterScreen");
+  app.classList.add("startPosterScreen");
   saved=false; selectedLevel=""; selectedDay="";
   setDayTheme("");
   app.innerHTML=`
-    <div class="emoji">🏝️🚤🌊</div>
-    <h1>Summer Island Rescue</h1>
-    <h2>Save Your Teachers!</h2>
-    <div class="story">폭풍 때문에 선생님들이 섬에 흩어졌어요.<br>영어 미션을 풀고 선생님들을 구해주세요!</div>
-    <input id="name" placeholder="이름 입력 예: 김민준" autocomplete="off"/>
-    <input id="className" placeholder="반 입력 예: SC1 / SE2 / ST3" autocomplete="off"/>
-    <div class="story" style="margin-bottom:6px;">난이도를 선택하세요.</div>
-    <button class="levelBtn" id="lv1" onclick="selectLevel('LEVEL1')">🟢 LEVEL 1 - 파닉스</button>
-    <button class="levelBtn" id="lv2" onclick="selectLevel('LEVEL2')">🟡 LEVEL 2 - 의미와 문맥</button>
-    <button class="levelBtn" id="lv3" onclick="selectLevel('LEVEL3')">🔴 LEVEL 3 - 기초 문법</button>
-    <button onclick="goDaySelect()">다음</button>
-    <div class="small">LEVEL 1·2·3 DAY1~DAY4</div>`;
-}
+    <h1 class="startPosterTitle">여름방학 영어 섬 탈출 프로젝트</h1>
+    <img class="mainPoster" src="images/main-poster.jpg" alt="여름방학 영어 섬 탈출 프로젝트 포스터"
+      onerror="this.style.display='none';">
+    <div class="story">영어 미션을 해결하고 섬에 흩어진 선생님들을 구해주세요!</div>
 
+    <div class="startForm">
+      <input id="name" placeholder="이름 입력 예: 김민준" autocomplete="off"/>
+      <input id="className" placeholder="반 입력 예: SC1 / SE2 / ST3" autocomplete="off"/>
+
+      <div class="story" style="color:#17324d;text-shadow:none;margin-bottom:6px;">난이도를 선택하세요.</div>
+      <button class="levelBtn" id="lv1" onclick="selectLevel('LEVEL1')">🟢 LEVEL 1 - 파닉스</button>
+      <button class="levelBtn" id="lv2" onclick="selectLevel('LEVEL2')">🟡 LEVEL 2 - 의미와 문맥</button>
+      <button class="levelBtn" id="lv3" onclick="selectLevel('LEVEL3')">🔴 LEVEL 3 - 기초 문법</button>
+      <button onclick="goDaySelect()">다음</button>
+    </div>
+
+    <div class="small">LEVEL 1·2·3 / DAY 1~4</div>`;
+}
 function selectLevel(level){
   selectedLevel=level;
   ["lv1","lv2","lv3"].forEach(id=>document.getElementById(id).classList.remove("selected"));
@@ -271,6 +374,7 @@ function goDaySelect(){
 }
 
 function daySelectScreen(){
+  app.classList.remove("finalScreen","storyScreen","startPosterScreen");
   app.classList.remove("finalScreen");
   app.innerHTML=`
     <div class="emoji">🗺️</div>
@@ -312,22 +416,30 @@ function beginGame(){
 }
 
 function storyIntro(){
-  app.classList.remove("finalScreen");
+  app.classList.remove("finalScreen","storyScreen","startPosterScreen");
+  app.classList.add("storyScreen");
+
   app.innerHTML=`
-    <div class="emoji">${currentDayData.introEmoji}</div>
-    <h1>${currentDayData.teacher} Rescue</h1>
+    <h1 class="storyTitle"><span class="teacherName">${currentDayData.teacher}</span> Rescue</h1>
+
     ${teacherPhoto("intro")}
-    <div class="teacher">😭 <b>${currentDayData.teacher} 선생님</b><br>"도와줘! ${currentDayData.place}에 있어!"<br>"영어 미션을 풀어서 나를 구해줘!"</div>
+
+    <div class="storyQuote">
+      😭 <b>${currentDayData.teacher} 선생님</b><br>
+      "도와줘! ${currentDayData.place}에 있어!"<br>
+      "영어 미션을 풀어서 나를 구해줘!"
+    </div>
+
     <div class="story">${currentDayData.intro}</div>
     <div class="story">총 <b>12개 미션</b>을 완료하면 구조할 수 있어요.</div>
     <button onclick="showQuestion()">미션 시작</button>`;
 }
-
 function progressBar(){
   return "⭐".repeat(stars) + "☆".repeat(questions.length-stars);
 }
 
 function showQuestion(){
+  app.classList.remove("finalScreen","storyScreen","startPosterScreen");
   app.classList.remove("finalScreen");
   const item=questions[idx];
   let special="";
@@ -389,17 +501,23 @@ function checkAnswer(choice){
 }
 
 function storyMiddle1(){
-  app.classList.remove("finalScreen");
+  app.classList.remove("finalScreen","storyScreen","startPosterScreen");
+  app.classList.add("storyScreen");
+
   app.innerHTML=`
-    <div class="emoji" style="font-size:42px">👀✨</div>
-    <h1>${currentDayData.teacher} 선생님을 발견했어요!</h1>
+    <h1 class="storyTitle"><span class="teacherName">${currentDayData.teacher}</span> 선생님을 발견했어요!</h1>
+
     ${teacherPhoto("found")}
-    <div class="teacher">😭 "${currentDayData.mid1}"</div>
+
+    <div class="storyQuote">
+      🥹 "${currentDayData.mid1}"
+    </div>
+
     <div class="progress">${progressBar()}</div>
     <button onclick="showQuestion()">계속하기</button>`;
 }
-
 function storyMiddle2(){
+  app.classList.remove("finalScreen","storyScreen","startPosterScreen");
   app.classList.remove("finalScreen");
   app.innerHTML=`
     <div class="emoji">🚤✨</div>
@@ -410,6 +528,7 @@ function storyMiddle2(){
 }
 
 function endScreen(){
+  app.classList.remove("finalScreen","storyScreen","startPosterScreen");
   let badge="Bronze Rescuer";
   if(score>=100) badge="Gold Rescuer";
   else if(score>=80) badge="Silver Rescuer";
