@@ -99,7 +99,7 @@ var LEVEL2_DATA = {
         answer: "umbrella"
       }
     ]
-  }
+  
 
 
   },
@@ -405,7 +405,7 @@ var LEVEL2_DATA = {
         answer: "stop"
       }
     ]
-  }
+  
 
   },
 
