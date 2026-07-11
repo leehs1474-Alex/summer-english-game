@@ -590,7 +590,10 @@ function speak(text){
 
 function saveToSheet(){
   if(saved){document.getElementById("saveStatus").innerText="이미 저장되었습니다.";return;}
-  if(!WEB_APP_URL||WEB_APP_URL==="https://script.google.com/macros/s/AKfycbytZa1ykFlNE3a4XdJIPJyQzK7PiZlWXlbLU1k7CD23KzUGcpjMuJ6mNaJl-AjH1apl/exec"){alert("아직 Apps Script 웹 앱 URL이 들어가지 않았습니다.");return;}
+ if(!WEB_APP_URL){
+    alert("아직 Apps Script 웹 앱 URL이 들어가지 않았습니다.");
+    return;
+}
   const saveBtn=document.getElementById("saveBtn");
   const status=document.getElementById("saveStatus");
   saveBtn.disabled=true; status.innerText="저장 중... 잠시만 기다리세요.";
