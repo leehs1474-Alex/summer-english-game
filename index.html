@@ -6,13 +6,47 @@
 <title>Summer Island Rescue</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:linear-gradient(#58c7ff 0%,#b9f2ff 45%,#ffe891 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;color:#17324d}
-.game{width:min(94vw,760px);background:rgba(255,255,255,.96);border-radius:28px;padding:22px;box-shadow:0 12px 30px rgba(0,0,0,.22);text-align:center}
+body{
+  --day-bg:linear-gradient(#58c7ff 0%,#b9f2ff 45%,#ffe891 100%);
+  --day-brightness:.78;
+  margin:0;
+  font-family:Arial,"Noto Sans KR",sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#17324d;
+  position:relative;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:-10px;
+  background-image:var(--day-bg);
+  background-size:cover;
+  background-position:center;
+  filter:blur(2px) brightness(var(--day-brightness));
+  transform:scale(1.03);
+  z-index:-2;
+  transition:background-image .35s ease, filter .35s ease;
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(8,24,38,.18);
+  z-index:-1;
+  pointer-events:none;
+}
+.game{width:min(94vw,760px);background:rgba(255,255,255,.96);border-radius:28px;padding:22px;box-shadow:0 16px 42px rgba(0,0,0,.30);text-align:center;backdrop-filter:blur(2px)}
 h1{margin:8px 0;font-size:32px}h2{margin:8px 0 16px;font-size:24px}
 .emoji{font-size:72px;margin:10px 0}.story{font-size:18px;line-height:1.55;margin:14px 0 18px}
 input{font-size:18px;padding:13px;width:86%;margin:7px 0;border:2px solid #b8d8ee;border-radius:12px}
 button{font-size:18px;font-weight:bold;padding:13px 18px;margin:8px;border:none;border-radius:16px;background:#1d9a6c;color:white;cursor:pointer;box-shadow:0 5px 0 #12714e}
-button:active{transform:translateY(2px);box-shadow:0 3px 0 #12714e}button:disabled{background:#99aaa2;box-shadow:0 5px 0 #707870;cursor:not-allowed}
+button:hover{transform:translateY(-2px) scale(1.02)}
+button:active{transform:translateY(2px);box-shadow:0 3px 0 #12714e}
+button:disabled{background:#99aaa2;box-shadow:0 5px 0 #707870;cursor:not-allowed}
 .choice{display:block;width:90%;margin:11px auto;background:#fff;color:#17324d;border:3px solid #8fd4ff;box-shadow:none;font-size:21px}
 .dayBtn,.levelBtn{display:block;width:90%;margin:12px auto;background:#fff;color:#17324d;border:3px solid #ffd35c;box-shadow:none;text-align:left}
 .dayBtn.selected,.levelBtn.selected{background:#fff1aa;border-color:#ff9f1c}
@@ -27,6 +61,23 @@ button:active{transform:translateY(2px);box-shadow:0 3px 0 #12714e}button:disabl
 .grid{display:grid;grid-template-columns:1fr;gap:4px}
 .sceneImage{display:block;width:min(100%,620px);max-height:340px;object-fit:contain;margin:12px auto;border-radius:18px;border:3px solid #b8d8ee;background:#f7fcff}
 .sentenceBox{font-size:21px;line-height:1.55;background:#fff8d8;border:3px solid #ffd35c;border-radius:16px;padding:16px;margin:14px auto;width:92%;font-weight:bold}
+.teacherPhoto{
+  display:block;
+  width:320px;
+  height:320px;
+  object-fit:cover;
+  object-position:center;
+  margin:14px auto;
+  border-radius:24px;
+  border:4px solid rgba(255,211,92,.95);
+  box-shadow:0 12px 28px rgba(0,0,0,.28);
+  background:#eef7ff;
+  transition:transform .25s ease;
+}
+.teacherPhoto:hover{
+  transform:scale(1.02);
+}
+
 </style>
 </head>
 <body>
@@ -41,9 +92,59 @@ let playerName="", playerClass="", selectedLevel="", selectedDay="";
 let currentDayData=null, questions=[];
 let idx=0, score=0, stars=0, startTime=null, saved=false;
 const app=document.getElementById("app");
+const DAY_BACKGROUNDS={
+  DAY1:{path:"images/backgrounds/day1.jpg",brightness:.82},
+  DAY2:{path:"images/backgrounds/day2.jpg",brightness:.72},
+  DAY3:{path:"images/backgrounds/day3.jpg",brightness:.68},
+  DAY4:{path:"images/backgrounds/day4.jpg",brightness:.70}
+};
+
+const TEACHER_IMAGES={
+  DAY1:{
+    intro:"images/teachers/rachel-intro.jpg",
+    found:"images/teachers/rachel-found.jpg",
+    rescued:"images/teachers/rachel-rescued.jpg"
+  },
+  DAY2:{
+    intro:"images/teachers/alex-intro.jpg",
+    found:"images/teachers/alex-found.jpg",
+    rescued:"images/teachers/alex-rescued.jpg"
+  },
+  DAY3:{
+    intro:"images/teachers/sunny-intro.jpg",
+    found:"images/teachers/sunny-found.jpg",
+    rescued:"images/teachers/sunny-rescued.jpg"
+  },
+  DAY4:{
+    intro:"images/teachers/daniel-intro.jpg",
+    found:"images/teachers/daniel-found.jpg",
+    rescued:"images/teachers/daniel-rescued.jpg"
+  }
+};
+
+function setDayTheme(day){
+  const bg=DAY_BACKGROUNDS[day];
+  if(bg){
+    document.body.style.setProperty("--day-bg",`url("${bg.path}")`);
+    document.body.style.setProperty("--day-brightness",String(bg.brightness));
+  }else{
+    document.body.style.setProperty("--day-bg","linear-gradient(#58c7ff 0%,#b9f2ff 45%,#ffe891 100%)");
+    document.body.style.setProperty("--day-brightness","1");
+  }
+}
+
+function teacherPhoto(stage){
+  const dayImages=TEACHER_IMAGES[selectedDay];
+  const src=dayImages ? dayImages[stage] : "";
+  if(!src) return "";
+  return `<img class="teacherPhoto" src="${src}" alt="${currentDayData.teacher} 선생님"
+    onerror="this.style.display='none';">`;
+}
+
 
 function startScreen(){
   saved=false; selectedLevel=""; selectedDay="";
+  setDayTheme("");
   app.innerHTML=`
     <div class="emoji">🏝️🚤🌊</div>
     <h1>Summer Island Rescue</h1>
@@ -90,6 +191,7 @@ function daySelectScreen(){
 
 function selectDay(day){
   selectedDay=day;
+  setDayTheme(day);
   ["d1","d2","d3","d4"].forEach(id=>document.getElementById(id).classList.remove("selected"));
   document.getElementById("d"+day.replace("DAY","")).classList.add("selected");
 }
@@ -118,6 +220,7 @@ function storyIntro(){
   app.innerHTML=`
     <div class="emoji">${currentDayData.introEmoji}</div>
     <h1>${currentDayData.teacher} Rescue</h1>
+    ${teacherPhoto("intro")}
     <div class="teacher">😭 <b>${currentDayData.teacher} 선생님</b><br>"도와줘! ${currentDayData.place}에 있어!"<br>"영어 미션을 풀어서 나를 구해줘!"</div>
     <div class="story">${currentDayData.intro}</div>
     <div class="story">총 <b>12개 미션</b>을 완료하면 구조할 수 있어요.</div>
@@ -191,7 +294,8 @@ function checkAnswer(choice){
 function storyMiddle1(){
   app.innerHTML=`
     <div class="emoji">👀✨</div>
-    <h1>선생님 발견!</h1>
+    <h1>${currentDayData.teacher} 선생님을 발견했어요!</h1>
+    ${teacherPhoto("found")}
     <div class="teacher">😭 "${currentDayData.mid1}"</div>
     <div class="progress">${progressBar()}</div>
     <button onclick="showQuestion()">계속하기</button>`;
@@ -213,6 +317,7 @@ function endScreen(){
   app.innerHTML=`
     <div class="emoji">🚤🏆🌊</div>
     <h1>${currentDayData.teacher} 구조 성공!</h1>
+    ${teacherPhoto("rescued")}
     <div class="teacher">🥹 <b>${currentDayData.teacher} 선생님</b><br>"고마워! 덕분에 무사히 탈출했어!"</div>
     <div class="badge">${stars} / ${questions.length} ⭐<br>${score} EXP<br>${badge}</div>
     <div class="story">이름: ${playerName}<br>반: ${playerClass}<br>난이도: ${selectedLevel}<br>DAY: ${selectedDay}<br>점수: ${score}</div>
