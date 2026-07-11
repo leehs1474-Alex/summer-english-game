@@ -63,19 +63,112 @@ button:disabled{background:#99aaa2;box-shadow:0 5px 0 #707870;cursor:not-allowed
 .sentenceBox{font-size:21px;line-height:1.55;background:#fff8d8;border:3px solid #ffd35c;border-radius:16px;padding:16px;margin:14px auto;width:92%;font-weight:bold}
 .teacherPhoto{
   display:block;
-  width:320px;
-  height:320px;
-  object-fit:cover;
+  width:430px;
+  max-width:92%;
+  height:auto;
+  object-fit:contain;
   object-position:center;
-  margin:14px auto;
+  margin:18px auto;
   border-radius:24px;
   border:4px solid rgba(255,211,92,.95);
-  box-shadow:0 12px 28px rgba(0,0,0,.28);
+  box-shadow:0 14px 34px rgba(0,0,0,.30);
   background:#eef7ff;
   transition:transform .25s ease;
 }
 .teacherPhoto:hover{
-  transform:scale(1.02);
+  transform:scale(1.03);
+}
+
+
+/* Final rescue screen */
+.game.finalScreen{
+  width:min(96vw,980px);
+  background:rgba(10,20,28,.32);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 18px 55px rgba(0,0,0,.45);
+  color:#fff;
+  padding:24px 26px 30px;
+  backdrop-filter:blur(7px);
+}
+.finalTitle{
+  margin:4px 0 18px;
+  font-size:clamp(36px,6vw,64px);
+  line-height:1.08;
+  color:#fff8de;
+  text-shadow:0 4px 14px rgba(0,0,0,.8);
+}
+.finalTitle .teacherName{
+  color:#ffd34e;
+}
+.finalScreen .teacherPhoto{
+  width:min(92%,760px);
+  max-width:760px;
+  height:auto;
+  max-height:none;
+  object-fit:contain;
+  margin:12px auto 22px;
+  border-radius:30px;
+  border:4px solid rgba(255,197,45,.96);
+  box-shadow:0 18px 45px rgba(0,0,0,.48),0 0 24px rgba(255,185,45,.24);
+}
+.finalQuote{
+  width:min(94%,820px);
+  margin:0 auto 18px;
+  padding:16px 20px;
+  border-radius:22px;
+  background:rgba(255,248,220,.96);
+  color:#17324d;
+  border:3px dashed #ffb52f;
+  font-size:20px;
+  line-height:1.55;
+}
+.finalScore{
+  display:inline-block;
+  min-width:280px;
+  margin:4px auto 18px;
+  padding:18px 28px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#fff5b8,#ffe37a);
+  color:#17324d;
+  border:3px solid #ffc83d;
+  box-shadow:0 10px 24px rgba(0,0,0,.28);
+  font-size:28px;
+  line-height:1.25;
+}
+.finalInfo{
+  width:min(94%,850px);
+  margin:0 auto 18px;
+  padding:12px 16px;
+  border-radius:16px;
+  background:rgba(0,0,0,.24);
+  color:#fff;
+  font-size:17px;
+  line-height:1.65;
+}
+.finalActions{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:10px;
+}
+.finalActions button{
+  min-width:190px;
+  margin:4px;
+}
+.finalScreen .status,
+.finalScreen .small{
+  color:#fff;
+  text-shadow:0 2px 6px rgba(0,0,0,.8);
+}
+@media (max-width:640px){
+  .game.finalScreen{padding:18px 12px 24px}
+  .finalTitle{font-size:38px}
+  .finalScreen .teacherPhoto{width:96%;border-radius:22px}
+  .finalQuote{font-size:18px}
+  .finalScore{font-size:24px;min-width:240px}
+  .finalActions{display:grid;grid-template-columns:1fr}
+  .finalActions button{width:92%;min-width:0;margin:4px auto}
 }
 
 </style>
@@ -143,6 +236,7 @@ function teacherPhoto(stage){
 
 
 function startScreen(){
+  app.classList.remove("finalScreen");
   saved=false; selectedLevel=""; selectedDay="";
   setDayTheme("");
   app.innerHTML=`
@@ -177,6 +271,7 @@ function goDaySelect(){
 }
 
 function daySelectScreen(){
+  app.classList.remove("finalScreen");
   app.innerHTML=`
     <div class="emoji">🗺️</div>
     <h1>오늘의 미션 선택</h1>
@@ -217,6 +312,7 @@ function beginGame(){
 }
 
 function storyIntro(){
+  app.classList.remove("finalScreen");
   app.innerHTML=`
     <div class="emoji">${currentDayData.introEmoji}</div>
     <h1>${currentDayData.teacher} Rescue</h1>
@@ -232,6 +328,7 @@ function progressBar(){
 }
 
 function showQuestion(){
+  app.classList.remove("finalScreen");
   const item=questions[idx];
   let special="";
   if(item.type==="helper") special=`<div class="helper">⭐ Helper Word는 파닉스 규칙만으로 읽기 어려운 특별한 단어예요!</div>`;
@@ -292,8 +389,9 @@ function checkAnswer(choice){
 }
 
 function storyMiddle1(){
+  app.classList.remove("finalScreen");
   app.innerHTML=`
-    <div class="emoji">👀✨</div>
+    <div class="emoji" style="font-size:42px">👀✨</div>
     <h1>${currentDayData.teacher} 선생님을 발견했어요!</h1>
     ${teacherPhoto("found")}
     <div class="teacher">😭 "${currentDayData.mid1}"</div>
@@ -302,6 +400,7 @@ function storyMiddle1(){
 }
 
 function storyMiddle2(){
+  app.classList.remove("finalScreen");
   app.innerHTML=`
     <div class="emoji">🚤✨</div>
     <h1>거의 다 왔어요!</h1>
@@ -314,20 +413,42 @@ function endScreen(){
   let badge="Bronze Rescuer";
   if(score>=100) badge="Gold Rescuer";
   else if(score>=80) badge="Silver Rescuer";
+
+  app.classList.add("finalScreen");
+
   app.innerHTML=`
-    <div class="emoji">🚤🏆🌊</div>
-    <h1>${currentDayData.teacher} 구조 성공!</h1>
+    <h1 class="finalTitle"><span class="teacherName">${currentDayData.teacher}</span> 구조 성공!</h1>
+
     ${teacherPhoto("rescued")}
-    <div class="teacher">🥹 <b>${currentDayData.teacher} 선생님</b><br>"고마워! 덕분에 무사히 탈출했어!"</div>
-    <div class="badge">${stars} / ${questions.length} ⭐<br>${score} EXP<br>${badge}</div>
-    <div class="story">이름: ${playerName}<br>반: ${playerClass}<br>난이도: ${selectedLevel}<br>DAY: ${selectedDay}<br>점수: ${score}</div>
-    <button id="saveBtn" onclick="saveToSheet()">선생님 기록에 저장하기</button>
-    <button onclick="daySelectScreen()">다른 DAY 하기</button>
-    <button onclick="startScreen()">처음으로</button>
-    <div class="status" id="saveStatus">마지막으로 저장 버튼을 눌러야 기록됩니다.</div>
+
+    <div class="finalQuote">
+      💖 <b>${currentDayData.teacher} 선생님</b><br>
+      "고마워! 덕분에 무사히 탈출했어!"
+    </div>
+
+    <div class="finalScore">
+      ${stars} / ${questions.length} ⭐<br>
+      ${score} EXP<br>
+      <b>${badge}</b>
+    </div>
+
+    <div class="finalInfo">
+      이름: ${playerName} &nbsp; | &nbsp;
+      반: ${playerClass} &nbsp; | &nbsp;
+      난이도: ${selectedLevel} &nbsp; | &nbsp;
+      DAY: ${selectedDay} &nbsp; | &nbsp;
+      점수: ${score}
+    </div>
+
+    <div class="finalActions">
+      <button id="saveBtn" onclick="saveToSheet()">💾 선생님 기록에 저장하기</button>
+      <button onclick="daySelectScreen()">📅 다른 DAY 하기</button>
+      <button onclick="startScreen()">🏠 처음으로</button>
+    </div>
+
+    <div class="status" id="saveStatus">💡 마지막으로 저장 버튼을 눌러야 기록됩니다.</div>
     <div class="small">${currentDayData.next}</div>`;
 }
-
 function playAudioFile(path){
   const audio = new Audio(path);
   audio.play().catch(err=>{
