@@ -34,6 +34,7 @@ button:active{transform:translateY(2px);box-shadow:0 3px 0 #12714e}button:disabl
 
 <script src="questions.js"></script>
 <script src="questions-level2.js"></script>
+<script src="questions-level3.js"></script>
 <script>
 const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
 let playerName="", playerClass="", selectedLevel="", selectedDay="";
@@ -51,11 +52,11 @@ function startScreen(){
     <input id="name" placeholder="이름 입력 예: 김민준" autocomplete="off"/>
     <input id="className" placeholder="반 입력 예: SC1 / SE2 / ST3" autocomplete="off"/>
     <div class="story" style="margin-bottom:6px;">난이도를 선택하세요.</div>
-    <button class="levelBtn" id="lv1" onclick="selectLevel('LEVEL1')">🟢 LEVEL 1 - 파닉스 / 초1~2</button>
-    <button class="levelBtn" id="lv2" onclick="selectLevel('LEVEL2')">🟡 LEVEL 2 - 의미·문맥 / 초3~5</button>
-    <button class="levelBtn" id="lv3" onclick="selectLevel('LEVEL3')">🔴 LEVEL 3 - 독해·문법 / 준비 중</button>
+    <button class="levelBtn" id="lv1" onclick="selectLevel('LEVEL1')">🟢 LEVEL 1 - 파닉스</button>
+    <button class="levelBtn" id="lv2" onclick="selectLevel('LEVEL2')">🟡 LEVEL 2 - 의미와 문맥</button>
+    <button class="levelBtn" id="lv3" onclick="selectLevel('LEVEL3')">🔴 LEVEL 3 - 기초 문법</button>
     <button onclick="goDaySelect()">다음</button>
-    <div class="small">현재 버전: LEVEL 1·2 DAY1~DAY4</div>`;
+    <div class="small">LEVEL 1·2·3 DAY1~DAY4</div>`;
 }
 
 function selectLevel(level){
@@ -71,7 +72,6 @@ function goDaySelect(){
   playerClass=document.getElementById("className").value.trim();
   if(!playerName||!playerClass){alert("이름과 반을 정확히 입력하세요.");return;}
   if(!selectedLevel){alert("난이도를 선택하세요.");return;}
-  if(selectedLevel==="LEVEL3"){alert("LEVEL 3는 준비 중입니다.");return;}
   daySelectScreen();
 }
 
@@ -96,7 +96,17 @@ function selectDay(day){
 
 function beginGame(){
   if(!selectedDay){alert("DAY를 선택하세요.");return;}
-  const dataSource = selectedLevel === "LEVEL2" ? LEVEL2_DATA : GAME_DATA;
+  let dataSource;
+  if(selectedLevel==="LEVEL1"){
+    dataSource=GAME_DATA;
+  }else if(selectedLevel==="LEVEL2"){
+    dataSource=LEVEL2_DATA;
+  }else if(selectedLevel==="LEVEL3"){
+    dataSource=LEVEL3_DATA;
+  }else{
+    alert("난이도를 다시 선택하세요.");
+    return;
+  }
   currentDayData=dataSource[selectedDay];
   if(!currentDayData){alert("선택한 레벨의 문제가 아직 준비되지 않았습니다.");return;}
   questions=currentDayData.questions;
